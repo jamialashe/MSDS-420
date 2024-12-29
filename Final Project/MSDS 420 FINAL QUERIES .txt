@@ -1,0 +1,96 @@
+MSDS 420 FINAL QUERIES 
+-------------------------------------------------------------------------------------------
+
+SELECT COUNT(*)
+FROM review
+WHERE asin_id = 'B000PFDHKA'
+AND overall = 5;
+-------------------------------------------------------------------------------------------
+SELECT COUNT(*)
+FROM review 
+WHERE review_time >= '2014-01-01' AND review_time <= '2014-01-30';
+-------------------------------------------------------------------------------------------
+SELECT COUNT(*)
+FROM review
+WHERE helpful_denominator IS NOT NULL;
+-------------------------------------------------------------------------------------------
+SELECT 
+	category AS product_category,
+	COUNT(asin_id) AS product_count
+FROM 
+	Appliance
+GROUP BY
+	category;
+-------------------------------------------------------------------------------------------
+SELECT COUNT(DISTINCT category) AS categories_
+FROM Appliance;
+-------------------------------------------------------------------------------------------
+SELECT AVG(overall) AS avg_rate
+FROM Review;
+-------------------------------------------------------------------------------------------
+SELECT COUNT(DISTINCT reviewer_id) AS Unique_Reviewers
+FROM review;
+------------------------------------------------------------------------------------------
+SELECT 
+	appliance.category AS sub_category,
+	COUNT(review.asin_id) AS review
+FROM
+	appliance
+LEFT JOIN
+	review ON appliance.asin_id = review.asin_id
+GROUP BY
+	appliance.category;
+-------------------------------------------------------------------------------------------
+SELECT AVG(LENGTH(review.review)) AS Avg_Review_Length
+FROM Review;
+-------------------------------------------------------------------------------------------
+SELECT EXTRACT(YEAR FROM review_time) AS year_, EXTRACT(MONTH FROM review_time) AS month_, 
+COUNT(*) AS count_
+FROM review
+WHERE EXTRACT(YEAR FROM review_time) >= 2011
+  AND EXTRACT(YEAR FROM review_time) <= 2014
+  AND EXTRACT(MONTH FROM review_time) = 1
+GROUP BY EXTRACT(MONTH FROM review_time), EXTRACT(YEAR FROM review_time)
+ORDER BY month_, year_;
+------------------------------------------------------------------------------------------
+SELECT category, EXTRACT(YEAR FROM review_time) AS year, COUNT(*) as count_
+FROM review
+JOIN appliance ON appliance.asin_id = review.asin_id
+WHERE EXTRACT(YEAR FROM review_time) IN (2011,2012,2013,2014)
+	AND EXTRACT(MONTH FROM review_time) = 5
+GROUP BY category, EXTRACT(YEAR FROM review_time)
+ORDER BY category, year ASC;
+-------------------------------------------------------------------------------------------
+SELECT
+    appliance.category AS subcategory,
+    AVG(appliance.price::numeric) AS average_price
+FROM
+    Appliance
+JOIN
+    Review ON appliance.asin_id = review.asin_id
+WHERE
+    review.overall > 3
+GROUP BY
+    appliance.category
+ORDER BY
+    appliance.category;
+-------------------------------------------------------------------------------------------
+SELECT category,
+       title,
+       review_count AS reviews_
+FROM (
+	SELECT
+	 	a.category,
+		a.title,
+		COUNT(r.asin_id) AS review_count,
+		ROW_NUMBER() OVER (PARTITION BY a.category ORDER BY COUNT(r.asin_id) DESC) AS rank
+FROM
+	Appliance a
+JOIN
+	Review r ON a.asin_id = r.asin_id
+GROUP BY 
+	a.category, a.title
+) ranked
+WHERE rank <= 3
+ORDER BY category, rank;
+-------------------------------------------------------------------------------------------

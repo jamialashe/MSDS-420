@@ -1,0 +1,31 @@
+MSDS 420 FINAL DATABASE TABLES 
+
+CREATE TABLE Customer
+(asin_id VARCHAR (255),
+ reviewer_id VARCHAR (255), 
+ reviewer_name VARCHAR (255),
+ PRIMARY KEY (reviewer_id, asin_id));
+
+CREATE TABLE Review (
+    reviewer_id VARCHAR(255),
+    asin_id VARCHAR(255),
+    reviewer_name VARCHAR(255),
+    helpful_numerator INT,
+    helpful_denominator INT,
+    review TEXT,
+    summary TEXT,
+    overall DECIMAL(2,1) CHECK (overall >= 0 AND overall <= 5),
+    unix_review_time BIGINT,
+    review_time DATE,
+    PRIMARY KEY (asin_id, reviewer_id));
+
+CREATE TABLE Appliance
+(asin_id VARCHAR (255) PRIMARY KEY,
+ title VARCHAR (255), 
+ category VARCHAR (255),
+ description TEXT,
+ brand VARCHAR (255),
+ price DECIMAL (10,3),
+ imURL TEXT,
+ related TEXT,
+ salesrank INTEGER); 
